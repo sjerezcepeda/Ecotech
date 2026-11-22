@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="ecotech.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2262"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="asignaciones_proyecto" custom_title="0" dock_id="1" table="4,21:mainasignaciones_proyecto"/><dock_state state="000000ff00000000fd00000001000000020000019c00000178fc0100000001fb000000160064006f0063006b00420072006f007700730065003101000000000000019c0000011e00ffffff0000019c0000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="asignaciones_proyecto" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort><column index="0" mode="1"/></sort><column_widths><column index="1" value="83"/><column index="2" value="78"/><column index="3" value="43"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">PRAGMA foreign_keys = ON;
+
+CREATE TABLE departamentos (
+    id INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL UNIQUE,
+    gerente_id INTEGER,
+    FOREIGN KEY (gerente_id)
+        REFERENCES empleados(id)
+        ON DELETE RESTRICT
+);
+
+CREATE TABLE empleados (
+    id INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    direccion TEXT NOT NULL,
+    telefono TEXT NOT NULL,
+    correo TEXT NOT NULL COLLATE NOCASE UNIQUE,
+    fecha_inicio_contrato TEXT NOT NULL,
+    salario INTEGER NOT NULL CHECK (salario &gt;= 0),
+    departamento_id INTEGER,
+    FOREIGN KEY (departamento_id)
+        REFERENCES departamentos(id)
+        ON DELETE RESTRICT
+);
+
+CREATE TABLE proyectos (
+    id INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    descripcion TEXT NOT NULL,
+    fecha_inicio TEXT NOT NULL
+);
+
+CREATE TABLE asignaciones_proyecto (
+    empleado_id INTEGER NOT NULL,
+    proyecto_id INTEGER NOT NULL,
+    activa INTEGER NOT NULL DEFAULT 1
+        CHECK (activa IN (0, 1)),
+    PRIMARY KEY (empleado_id, proyecto_id),
+    FOREIGN KEY (empleado_id)
+        REFERENCES empleados(id)
+        ON DELETE RESTRICT,
+    FOREIGN KEY (proyecto_id)
+        REFERENCES proyectos(id)
+        ON DELETE RESTRICT
+);
+
+CREATE TABLE registros_tiempo (
+    id INTEGER PRIMARY KEY,
+    empleado_id INTEGER NOT NULL,
+    proyecto_id INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    minutos INTEGER NOT NULL
+        CHECK (minutos &gt; 0 AND minutos &lt;= 1440),
+    descripcion TEXT NOT NULL,
+    FOREIGN KEY (empleado_id, proyecto_id)
+        REFERENCES asignaciones_proyecto(
+            empleado_id,
+            proyecto_id
+        )
+        ON DELETE RESTRICT
+);</sql><current_tab id="0"/></tab_sql></sqlb_project>
